@@ -9,6 +9,7 @@ import {
   Show,
   createContext,
   useContext,
+  on,
 } from "solid-js";
 import { createStore } from "solid-js/store";
 import { useLongPress } from "../utils";
@@ -153,7 +154,9 @@ function Container(props) {
   const [lengthProperty, setLengthProperty] = createSignal(null);
   const [scrollProperty, setScrollProperty] = createSignal(null);
   const [clientLengthProperty, setClientLengthProperty] = createSignal(null);
-  const [containerStartPos, setContainerStartPos] = createSignal(null);
+  // Read live: containers can move after mount (stacked lanes, outer scroll).
+  const containerStartPos = () =>
+    containerRef.getBoundingClientRect()[positionProperty()];
   const [startPageCoordinates, setStartPageCoordinates] = createSignal(null);
 
   let containerRef;
@@ -187,6 +190,7 @@ function Container(props) {
       group: props.group,
     });
     setStartPageCoordinates({ x: pageX, y: pageY });
+    measureContainer();
     const newPositions = calculateNewPositions();
     setPositions(newPositions);
   }
@@ -224,7 +228,7 @@ function Container(props) {
 
   const [onLongPressStart, onLongPressEnd] = useLongPress(
     handleTouchStart,
-    500
+    350
   );
 
   function handleTouchStart(e, currentTarget) {
@@ -424,8 +428,9 @@ function Container(props) {
     setTargetBeforeMoving(null);
   }
 
-  // setup signals, runs when items container ref changes
-  createEffect(() => {
+  // Layout can change after mount (e.g. switching view mode), so this re-runs
+  // whenever a drag starts instead of trusting values captured at mount.
+  function measureContainer() {
     const containerComputedStyle = window.getComputedStyle(containerRef);
     const computedGap = containerComputedStyle.gap;
     const gapIsInteger =
@@ -443,9 +448,10 @@ function Container(props) {
     setClientLengthProperty(
       flexDirection === "row" ? "clientWidth" : "clientHeight"
     );
-    setContainerStartPos(
-      containerRef.getBoundingClientRect()[positionProperty()]
-    );
+  }
+
+  createEffect(() => {
+    measureContainer();
     containerRef.removeEventListener("mousemove", handlePointerMove);
     containerRef.addEventListener("mousemove", handlePointerMove);
     containerRef.removeEventListener("touchmove", handlePointerMove, {
@@ -460,6 +466,17 @@ function Container(props) {
     );
     containerRef.addEventListener("scroll", preventDragWhenScrollingWithTouch);
   });
+
+  createEffect(
+    on(
+      () => dragAndDropTarget().originalElement,
+      (draggedElement) => {
+        if (draggedElement) {
+          measureContainer();
+        }
+      }
+    )
+  );
 
   function handleContextMenu(e) {
     e.preventDefault();
@@ -558,32 +575,29 @@ function Container(props) {
     if (dragAndDropTarget().group !== props.group) {
       return;
     }
-    const outerDirection = flexDirection() === "row" ? "top" : "left";
-    const outerClientLength =
-      flexDirection() === "row" ? "clientHeight" : "clientWidth";
-    if (prev === dragAndDropTarget()[outerDirection]) {
+    const { left, top, cursorDisplacementLeft, cursorDisplacementTop } =
+      dragAndDropTarget();
+    const coordinates = `${left},${top}`;
+    if (prev === coordinates) {
       return prev;
     }
-    const containerEdgeStart =
-      containerRef.getBoundingClientRect()[outerDirection];
-    const containerEdgeEnd =
-      containerRef.getBoundingClientRect()[outerDirection] +
-      containerRef[outerClientLength];
-    const isBeforeEndEdge =
-      dragAndDropTarget()[outerDirection] +
-        dragAndDropTarget().originalElement[outerClientLength] / 2 <=
-      containerEdgeEnd;
-    const isAfterStartEdge =
-      dragAndDropTarget()[outerDirection] +
-        dragAndDropTarget().originalElement[outerClientLength] / 2 >
-      containerEdgeStart;
-    const isWithinBounds = isBeforeEndEdge && isAfterStartEdge;
+    // Hit-test the pointer (where a finger aims), checking both axes because
+    // stacked containers share the cross axis. The parent (e.g. a lane with
+    // its header) is the drop zone, so a tight container is still easy to hit.
+    const pointerX = left + cursorDisplacementLeft;
+    const pointerY = top + cursorDisplacementTop;
+    const rect = containerRef.parentElement.getBoundingClientRect();
+    const isWithinBounds =
+      pointerX > rect.left &&
+      pointerX <= rect.right &&
+      pointerY > rect.top &&
+      pointerY <= rect.bottom;
     if (isWithinBounds) {
       setDragAndDropTarget((prev) => ({
         ...prev,
         to: props.id,
       }));
-      return dragAndDropTarget()[outerDirection];
+      return coordinates;
     }
     if (dragAndDropTarget().to === props.id) {
       setDragAndDropTarget((prev) => ({
@@ -591,7 +605,7 @@ function Container(props) {
         to: null,
       }));
     }
-    return dragAndDropTarget()[outerDirection];
+    return coordinates;
   });
 
   // update autoScrollAmount, runs when target top or left changes

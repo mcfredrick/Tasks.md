@@ -718,6 +718,170 @@ a > * {
   gap: 6px;
 }
 
+/* Lanes stack vertically; drag-and-drop derives its axis from flex-direction. */
+.view-mode-list .lanes {
+  flex-direction: column;
+  gap: 28px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: none;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.view-mode-list .lane {
+  flex-shrink: 0;
+}
+
+.view-mode-list .lane__header {
+  max-width: none;
+}
+
+.view-mode-list .lane__content {
+  width: 100%;
+  flex-grow: 0;
+  overflow-y: visible;
+  min-height: 48px;
+  /* Room below the last card to drop at the end of a lane. */
+  padding: 6px 6px 24px;
+  gap: 4px;
+}
+
+.view-mode-list .card {
+  padding: 8px 12px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 4px;
+}
+
+/* Full-width name row pushes tags and due date onto a second line. */
+.view-mode-list .card__toolbar {
+  flex: 1 1 100%;
+  align-items: center;
+}
+
+.view-mode-list .card__name {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.view-mode-list .card__content {
+  display: none;
+}
+
+.view-mode-list .card__tags,
+.view-mode-list .card__tags:not(:empty),
+.view-mode-list .card__due-date:not(:empty) {
+  min-height: 0;
+  margin-top: 0;
+  flex-wrap: nowrap;
+}
+
+/* iOS otherwise shows its copy/lookup callout during a long-press drag. */
+.card,
+.lane__header {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.app-header__controls {
+  display: contents;
+}
+
+.app-header__toggle {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  #root {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .app-header {
+    position: relative;
+    padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .app-header .search-input {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    height: 44px;
+  }
+
+  .app-header__toggle {
+    display: block;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 1.2rem;
+  }
+
+  .app-header__controls {
+    display: none;
+  }
+
+  .app-header__controls--open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    padding: 12px 16px 16px;
+    background: var(--color-background-2);
+    border-bottom: 1px solid var(--color-background-4);
+  }
+
+  .app-header__controls--open .app-header__group-item {
+    justify-content: space-between;
+  }
+
+  .app-header__controls--open select,
+  .app-header__controls--open button {
+    height: 44px;
+  }
+
+  .app-header__controls--open select {
+    flex: 0 1 60%;
+  }
+
+  .lanes {
+    padding: 16px 16px calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .lane__header button {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .view-mode-list .lanes {
+    gap: 24px;
+  }
+
+  .view-mode-list .card {
+    min-height: 52px;
+    padding: 10px 12px;
+    font-size: 1rem;
+  }
+
+  .view-mode-list .card button {
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
 .svg-icon-bg.iconEllipsisHorizontal {
   --bg-icon: url("~@stackoverflow/stacks-icons/src/Icon/EllipsisHorizontal.svg");
 }

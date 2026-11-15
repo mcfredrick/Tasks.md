@@ -47,7 +47,8 @@ function App() {
   const [newLaneName, setNewLaneName] = createSignal(null);
   const [cardBeingRenamed, setCardBeingRenamed] = createSignal(null);
   const [newCardName, setNewCardName] = createSignal(null);
-  const [viewMode, setViewMode] = makePersisted(createSignal("regular"), {
+  const isNarrowScreen = window.matchMedia("(max-width: 700px)").matches;
+  const [viewMode, setViewMode] = makePersisted(createSignal(isNarrowScreen ? "list" : "regular"), {
     storage: localStorage,
     name: "viewMode",
   });

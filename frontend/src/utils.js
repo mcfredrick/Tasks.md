@@ -39,13 +39,30 @@ export function getButtonCoordinates(event) {
 
 export function useLongPress(callback, pressDuration) {
 	let timeout = 0;
+	let startTouch = null;
+	const maxMovementBeforeCancel = 10;
+
+	// A finger that moves before the press completes is scrolling, not grabbing.
+	function cancelIfMoved(event) {
+		const touch = event.touches[0];
+		const movedX = Math.abs(touch.clientX - startTouch.clientX);
+		const movedY = Math.abs(touch.clientY - startTouch.clientY);
+		if (movedX > maxMovementBeforeCancel || movedY > maxMovementBeforeCancel) {
+			onLongPressEnd();
+		}
+	}
 
 	function onLongPressStart(event, currentTarget) {
-		clearTimeout(timeout);
+		onLongPressEnd();
 		event.stopPropagation();
+		startTouch = event.touches?.[0];
+		if (startTouch) {
+			document.addEventListener("touchmove", cancelIfMoved, { passive: true });
+		}
 		timeout = window.setTimeout(() => {
+			document.removeEventListener("touchmove", cancelIfMoved);
 			if (navigator.vibrate) {
-				navigator.vibrate(300);
+				navigator.vibrate(50);
 			}
 			callback(event, currentTarget);
 			clearTimeout(timeout);
@@ -53,6 +70,7 @@ export function useLongPress(callback, pressDuration) {
 	}
 
 	function onLongPressEnd() {
+		document.removeEventListener("touchmove", cancelIfMoved);
 		if (timeout) {
 			clearTimeout(timeout);
 		}
