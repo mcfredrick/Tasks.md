@@ -1,0 +1,208 @@
+/* 80s synthwave. Dark only, by design.
+   Selectors start with "html" to outrank the app stylesheet, which loads after this one. */
+@font-face {
+  font-family: "Audiowide";
+  src: url("../../fonts/audiowide.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root {
+  --color-accent: #ff2a6d;
+  --color-foreground: #f6e9ff;
+  --color-background-1: #120a24;
+  --color-background-2: #1c1137;
+  --color-background-3: #28194d;
+  --color-background-4: #3a2672;
+  --color-alt-1: #e0137a;
+  --color-alt-2: #e35b00;
+  --color-alt-3: #b8860b;
+  --color-alt-4: #8a2be2;
+  --color-alt-5: #00897b;
+  --color-alt-6: #b5179e;
+  --color-alt-7: #2d5bff;
+
+  --neon-pink: #ff2a6d;
+  --neon-cyan: #05d9e8;
+  --neon-orange: #ff9e3d;
+  --neon-violet: #b967ff;
+  --neon-yellow: #fdf500;
+  --display-font: "Audiowide", -apple-system, system-ui, sans-serif;
+  /* Fallback for the drag ghost, which renders outside its lane. */
+  --lane-color: var(--neon-pink);
+  color-scheme: dark;
+  accent-color: var(--neon-pink);
+}
+
+::selection {
+  background: var(--neon-pink);
+  color: #120a24;
+}
+
+/* Sunset sky up top, faint perspective grid rising from the bottom. */
+#root {
+  background:
+    linear-gradient(to bottom, transparent 55%, rgba(5, 217, 232, 0.08) 100%),
+    repeating-linear-gradient(to right, rgba(185, 103, 255, 0.07) 0 1px, transparent 1px 48px),
+    repeating-linear-gradient(to bottom, rgba(185, 103, 255, 0.07) 0 1px, transparent 1px 48px),
+    radial-gradient(ellipse 120% 60% at 50% 0%, #3b0f52 0%, #120a24 70%);
+  background-attachment: fixed;
+}
+
+html .lanes {
+  background: transparent;
+}
+
+html .app-header {
+  background: rgba(28, 17, 55, 0.92);
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(to right, var(--neon-pink), var(--neon-violet), var(--neon-cyan)) 1;
+  box-shadow: 0 4px 24px rgba(255, 42, 109, 0.18);
+}
+
+html .app-header__controls--open {
+  background: #1c1137;
+  border-bottom: 2px solid var(--neon-violet);
+}
+
+html input,
+html select,
+html button {
+  border: 1px solid rgba(185, 103, 255, 0.35);
+}
+
+html input:focus,
+html select:focus,
+html button:focus-visible {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 0 1px var(--neon-cyan), 0 0 12px rgba(5, 217, 232, 0.5);
+}
+
+@media (hover: hover) {
+  html button:hover {
+    filter: none;
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 10px rgba(255, 42, 109, 0.45);
+  }
+}
+
+html .app-header__toggle {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+}
+
+html .app-title {
+  font-family: var(--display-font);
+  font-weight: normal;
+  letter-spacing: 0.06em;
+  background: linear-gradient(to right, var(--neon-yellow), var(--neon-orange), var(--neon-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Each lane cycles through a neon color. */
+html .lane {
+  --lane-color: var(--neon-pink);
+}
+html .lane:nth-child(5n + 2) {
+  --lane-color: var(--neon-cyan);
+}
+html .lane:nth-child(5n + 3) {
+  --lane-color: var(--neon-orange);
+}
+html .lane:nth-child(5n + 4) {
+  --lane-color: var(--neon-violet);
+}
+html .lane:nth-child(5n + 5) {
+  --lane-color: var(--neon-yellow);
+}
+
+/* The base style clips overflow, which cuts the glow into a hard box. */
+html .lane__header-name-and-count {
+  overflow: visible;
+}
+
+html .lane__header-name {
+  font-family: var(--display-font);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--lane-color);
+  text-shadow: 0 0 6px var(--lane-color), 0 0 18px var(--lane-color);
+}
+
+html .lane__header .tag {
+  background: var(--lane-color);
+  box-shadow: 0 0 10px var(--lane-color);
+}
+
+html .lane__header .counter {
+  font-family: var(--display-font);
+  color: #120a24;
+}
+
+html .lane__header button {
+  color: var(--lane-color);
+  border-color: color-mix(in srgb, var(--lane-color) 50%, transparent);
+}
+
+html .lane__content {
+  background: rgba(28, 17, 55, 0.85);
+  border: 1px solid color-mix(in srgb, var(--lane-color) 55%, transparent);
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--lane-color) 25%, transparent),
+    inset 0 0 18px color-mix(in srgb, var(--lane-color) 8%, transparent);
+}
+
+html .card {
+  background: var(--color-background-3);
+  border-left: 3px solid var(--lane-color);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+}
+
+html .card:focus,
+html .card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--lane-color), 0 0 14px color-mix(in srgb, var(--lane-color) 60%, transparent);
+}
+
+html .card--selected {
+  background: color-mix(in srgb, var(--lane-color) 22%, var(--color-background-3));
+}
+
+html body .being-dragged.card {
+  border-left-color: var(--neon-yellow);
+  box-shadow: 0 0 0 1px var(--neon-yellow), 0 0 26px rgba(253, 245, 0, 0.55);
+  transform: rotate(-1.5deg) scale(1.02);
+}
+
+html .tag h5 {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+html .dialog-backdrop {
+  background: rgba(10, 4, 24, 0.75);
+  backdrop-filter: blur(3px);
+}
+
+html dialog {
+  border: 1px solid var(--neon-violet);
+  box-shadow: 0 0 30px rgba(185, 103, 255, 0.35);
+}
+
+html .dialog__toolbar-name h1 {
+  font-family: var(--display-font);
+  font-weight: normal;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px rgba(5, 217, 232, 0.6);
+}
+
+html .popup {
+  border: 1px solid var(--neon-pink);
+  box-shadow: 0 0 16px rgba(255, 42, 109, 0.4);
+}
+
+* {
+  scrollbar-color: var(--neon-violet) transparent;
+}

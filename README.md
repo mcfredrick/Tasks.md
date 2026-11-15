@@ -1,6 +1,22 @@
 # ![logo](public/logo.png) Tasks.md
 A self-hosted, Markdown file based task management board.
 
+## About this fork
+
+This fork of [BaldissaraMatheus/Tasks.md](https://github.com/BaldissaraMatheus/Tasks.md) is tuned for phones and adds a few things:
+
+<img src="docs/synthwave-phone.png" alt="Synthwave theme in List view on a phone" width="300" align="right">
+
+- **List view.** A new view mode stacks lanes as sections with one compact row per card. Phones open in List view by default.
+- **Mobile layout.** The header collapses to a search box and an options button on small screens. Tap targets are larger, and the layout respects iPhone notches and the home indicator.
+- **Touch dragging.** Press and hold a card for about a third of a second to drag it. A finger that moves before then scrolls the page instead of grabbing the card, and iOS no longer shows its copy menu mid-drag.
+- **Drag-and-drop fixes.** Containers re-measure their layout when a drag starts, so dragging works after switching view modes and in scrolled, stacked lanes. Dropping onto a lane's header now moves the card into that lane.
+- **Synthwave theme.** A neon 80s color theme with a per-lane color cycle and the bundled [Audiowide](https://fonts.google.com/specimen/Audiowide) font (SIL Open Font License). It's the default for new installs. Switch themes by editing `custom.css` as described under Customize below.
+
+The published `baldissaramatheus/tasks.md` Docker image doesn't include these changes. Build your own image from this repo with `docker build -t tasks.md .` and use `tasks.md` as the image name in the commands below. To run without Docker, use `./run-local.sh`, which keeps data in `~/Code/tasks-md-data` (override with `DATA_DIR`) and serves on port 8080 (override with `PORT`).
+
+<br clear="right">
+
 
 ![Demo](./public/demo.gif)
 
@@ -65,7 +81,7 @@ Use the Docker section above as reference for setting up variables and volumes.
 Clone the repository with `git clone --recursive`, open a terminal instance in the `/frontend` directory and another one in the `/backend` directory, then in both of them run `npm install` and `npm start`. The env variables are set in `package.json` file for both directories, and are the same ones listed in the Docker section above, plus `CONFIG_DIR` and `TASKS_DIR` for config and tasks directories paths.
 
 ## 🎨 Customize
-You can customize the application CSS through the `custom.css` (within `/config` directory if you're on Docker). You can replace the default `adwaita` theme with `nord` or `catppuccin`, or you can make your own changes. The easieste way to customize the application is to use the existing color variables (detailed [below](#color-variables)), but if you want to make changes other than color replacements you can use [index.css](frontend/src/stylesheets/index.css) file as a reference.
+You can customize the application CSS through the `custom.css` (within `/config` directory if you're on Docker). You can replace the default `synthwave` theme with `adwaita`, `nord` or `catppuccin`, or you can make your own changes. The easieste way to customize the application is to use the existing color variables (detailed [below](#color-variables)), but if you want to make changes other than color replacements you can use [index.css](frontend/src/stylesheets/index.css) file as a reference.
 
 ### Color variables
 - `color-accent`: Highlight color;
