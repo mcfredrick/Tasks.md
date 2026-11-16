@@ -1,0 +1,39 @@
+# Runs Tasks.md on a Synology NAS as its own Tailscale device named "todo",
+# reachable at http://todo and https://todo.<tailnet>.ts.net from the tailnet only.
+# See deploy/synology/README.md for setup.
+services:
+  tailscale:
+    image: tailscale/tailscale:stable
+    container_name: todo-tailscale
+    hostname: todo
+    environment:
+      # One-off auth key, only needed for the first start. Remove it once the
+      # device shows up in the Tailscale admin console.
+      - TS_AUTHKEY=tskey-auth-REPLACE-ME
+      - TS_STATE_DIR=/var/lib/tailscale
+      # Userspace networking avoids needing /dev/net/tun and extra privileges on DSM.
+      - TS_USERSPACE=true
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - ./tailscale:/var/lib/tailscale
+      - ./serve.json:/config/serve.json:ro
+    restart: unless-stopped
+
+  tasks:
+    build: ./src
+    image: tasks-md-fork
+    container_name: todo-tasks
+    # Shares the Tailscale container's network, so the app is only reachable
+    # through the tailnet and needs no port on the NAS itself.
+    network_mode: service:tailscale
+    depends_on:
+      - tailscale
+    environment:
+      - PORT=80
+      # The NAS user that should own the task files (Matt / users).
+      - PUID=1026
+      - PGID=100
+    volumes:
+      - ./tasks:/tasks
+      - ./config:/config
+    restart: unless-stopped

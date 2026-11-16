@@ -14,7 +14,7 @@ This fork of [BaldissaraMatheus/Tasks.md](https://github.com/BaldissaraMatheus/T
 - **Static file fix.** The server used to answer every unknown path with `index.html`, including fonts, the PWA manifest and the service worker. It now serves files that exist in the build and falls back to `index.html` for everything else.
 - **Synthwave theme.** A neon 80s color theme with a per-lane color cycle and the bundled [Audiowide](https://fonts.google.com/specimen/Audiowide) font (SIL Open Font License). It's the default for new installs. Switch themes by editing `custom.css` as described under Customize below.
 
-The published `baldissaramatheus/tasks.md` Docker image doesn't include these changes. Build your own image from this repo with `docker build -t tasks.md .` and use `tasks.md` as the image name in the commands below. To run without Docker, use `./run-local.sh`, which keeps data in `~/Code/tasks-md-data` (override with `DATA_DIR`) and serves on port 8080 (override with `PORT`).
+The published `baldissaramatheus/tasks.md` Docker image doesn't include these changes. Build your own image from this repo with `docker build -t tasks.md .` and use `tasks.md` as the image name in the commands below. To run without Docker, use `./run-local.sh`, which keeps data in `~/Code/tasks-md-data` (override with `DATA_DIR`) and serves on port 8080 (override with `PORT`). To run it on a Synology NAS as its own Tailscale device, see [deploy/synology](deploy/synology/README.md).
 
 <br clear="right">
 
