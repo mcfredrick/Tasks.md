@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const uuid = require("uuid");
 const Koa = require("koa");
 const Router = require("@koa/router");
@@ -277,12 +278,21 @@ app.use(mount((`${BASE_PATH || '/'}`), (ctx, next) => {
     const fileName = ctx.request.url.split('/').at(-1);
     ctx.request.url = `/assets/${fileName}`
   }
-  // default to index.html
-  else {
+  // Serve real build files (fonts, service worker, manifest); anything else
+  // is a client-side route, so default to index.html.
+  else if (!isStaticFile(ctx.path)) {
     ctx.request.url = '/'
   }
   return middleware(ctx, next)
 }));
+
+function isStaticFile(requestPath) {
+  const staticRoot = path.resolve('static');
+  const filePath = path.resolve(staticRoot, `.${decodeURIComponent(requestPath)}`);
+  return filePath.startsWith(`${staticRoot}${path.sep}`)
+    && fs.existsSync(filePath)
+    && fs.statSync(filePath).isFile();
+}
 
 async function getfilesPaths(dirPath) {
   const dirsAndFiles = (await fs.promises.readdir(dirPath,
