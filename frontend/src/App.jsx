@@ -17,6 +17,7 @@ import { Header } from "./components/header";
 import { Card } from "./components/card";
 import { CardName } from "./components/card-name";
 import { BulkOperationsToolbar } from "./components/bulk-operations-toolbar";
+import { Checklist } from "./components/checklist";
 import { makePersisted } from "@solid-primitives/storage";
 import { DragAndDrop } from "./components/drag-and-drop";
 import { useLocation, useNavigate } from "@solidjs/router";
@@ -876,6 +877,87 @@ function App() {
 
   const disableCardsDrag = createMemo(() => sort() !== "none" || selectionMode());
 
+  const findLane = (name) =>
+    lanes().find((lane) => lane.toLowerCase() === name.toLowerCase());
+  const doneLane = createMemo(() => findLane("done") ?? null);
+  const openLanes = createMemo(() => lanes().filter((lane) => lane !== doneLane()));
+  const checklistOpenItems = createMemo(() =>
+    openLanes().flatMap((lane) => getCardsFromLane(lane))
+  );
+  const checklistCompletedItems = createMemo(() =>
+    doneLane() ? getCardsFromLane(doneLane()) : []
+  );
+  // Reordering maps display positions back to lanes, which only works when
+  // the display shows every card in stored order.
+  const disableChecklistDrag = createMemo(
+    () => sort() !== "none" || search() !== "" || filteredTag() !== null
+  );
+
+  async function ensureLane(name) {
+    const existingLane = findLane(name);
+    if (existingLane) {
+      return existingLane;
+    }
+    await fetch(`${api}/resource${board()}/${encodeURIComponent(name)}`, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+    });
+    setLanes([...lanes(), name]);
+    return name;
+  }
+
+  function ensureInboxLane() {
+    return findLane("to do") ?? openLanes()[0] ?? ensureLane("To do");
+  }
+
+  async function addChecklistItem(name) {
+    const lane = await ensureInboxLane();
+    await fetch(`${api}/resource${board()}/${encodeURIComponent(lane)}/${encodeURIComponent(name)}.md`, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isFile: true }),
+    });
+    const now = new Date().toISOString();
+    const newCard = { name, lane, content: "", tags: [], dueDate: "", lastUpdated: now, createdAt: now };
+    const currentCards = cards();
+    const insertAt = currentCards.findLastIndex((card) => card.lane === lane) + 1;
+    setCards([...currentCards.slice(0, insertAt), newCard, ...currentCards.slice(insertAt)]);
+  }
+
+  async function toggleChecklistItem(card, isDone) {
+    const targetLane = isDone ? await ensureLane("Done") : await ensureInboxLane();
+    const index = isDone ? 0 : cards().filter((c) => c.lane === targetLane).length;
+    handleCardsSortChange({
+      id: `card-${card.name}`,
+      from: `lane-content-${card.lane}`,
+      to: `lane-content-${targetLane}`,
+      index,
+    });
+  }
+
+  function reorderChecklistItem(card, index) {
+    const otherItems = checklistOpenItems().filter((c) => c.name !== card.name);
+    const neighbor = otherItems[index - 1] ?? otherItems[index] ?? card;
+    const laneIndex = otherItems
+      .slice(0, index)
+      .filter((c) => c.lane === neighbor.lane).length;
+    handleCardsSortChange({
+      id: `card-${card.name}`,
+      from: `lane-content-${card.lane}`,
+      to: `lane-content-${neighbor.lane}`,
+      index: laneIndex,
+    });
+  }
+
+  function validateChecklistName(name, ignoredName) {
+    const existingNames = cards()
+      .map((card) => card.name)
+      .filter((cardName) => cardName !== ignoredName);
+    return validateName(name, existingNames);
+  }
+
   createEffect((prev) => {
     document.body.classList.remove(`view-mode-${prev}`);
     document.body.classList.add(`view-mode-${viewMode()}`);
@@ -1253,6 +1335,23 @@ function App() {
         />
       </Show>
       {title() ? <h1 class="app-title">{title()}</h1> : <></>}
+      <Show
+        when={viewMode() !== "list"}
+        fallback={
+          <Checklist
+            openItems={checklistOpenItems()}
+            completedItems={checklistCompletedItems()}
+            disableDrag={disableChecklistDrag()}
+            onToggle={toggleChecklistItem}
+            onAdd={addChecklistItem}
+            onRename={(card, newName) => renameCard(card.name, newName)}
+            onDelete={deleteCard}
+            onReorder={reorderChecklistItem}
+            validateName={validateChecklistName}
+            t={t}
+          />
+        }
+      >
       <DragAndDrop.Provider>
         <DragAndDrop.Container class={`lanes`} onChange={handleLanesSortChange}>
           <For each={lanes()}>
@@ -1388,6 +1487,7 @@ function App() {
         </DragAndDrop.Container>
         <DragAndDrop.Target />
       </DragAndDrop.Provider>
+      </Show>
       <Show when={renderUID()} keyed>
         <Show when={selectedCard()}>
           <ExpandedCard

@@ -26,6 +26,7 @@ export default {
 		tagSearchPlaceholder: "Buscar etiquetas", removeTagPlaceholder: "Eliminar etiqueta", createTag: 'Crear "{{tag}}"',
 		deleteConfirm: "¿Eliminar seleccionadas?", deleteConfirm_plural: "¿Eliminar seleccionadas?",
 	},
+	checklist: { addPlaceholder: "Añadir un elemento", completed: "Completados", starsCompleted: "{{count}} completados" },
 	validation: {
 		mustHaveName: "El nombre es obligatorio", hiddenByDot: "Oculto por punto", duplicateName: "Nombre duplicado",
 		forbiddenChars: "Caracteres prohibidos", noMdExtension: "Sin extensión .md", prohibitedName: "Nombre prohibido",

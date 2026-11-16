@@ -206,3 +206,81 @@ html .popup {
 * {
   scrollbar-color: var(--neon-violet) transparent;
 }
+
+/* Checklist: each row cycles through the neon colors. */
+html .checklist__item {
+  --item-color: var(--neon-pink);
+  background: rgba(28, 17, 55, 0.88);
+  border-bottom: none;
+  border-left: 3px solid var(--item-color);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--item-color) 15%, transparent);
+}
+html .checklist__item:nth-child(5n + 2) {
+  --item-color: var(--neon-cyan);
+}
+html .checklist__item:nth-child(5n + 3) {
+  --item-color: var(--neon-orange);
+}
+html .checklist__item:nth-child(5n + 4) {
+  --item-color: var(--neon-violet);
+}
+html .checklist__item:nth-child(5n + 5) {
+  --item-color: var(--neon-yellow);
+}
+
+html .checklist__checkbox {
+  --checkbox-color: var(--item-color);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--item-color) 45%, transparent);
+}
+
+html .checklist__item--done .checklist__checkbox {
+  --checkbox-color: var(--neon-violet);
+  box-shadow: none;
+}
+
+html .checklist__item--done {
+  --item-color: var(--color-background-4);
+  box-shadow: none;
+}
+
+html .checklist__grip {
+  color: var(--item-color);
+  opacity: 0.7;
+}
+
+html body .being-dragged.checklist__item {
+  border-left-color: var(--neon-yellow);
+  box-shadow: 0 0 0 1px var(--neon-yellow), 0 0 26px rgba(253, 245, 0, 0.55);
+  transform: rotate(-1deg) scale(1.02);
+}
+
+html .checklist__add-icon {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px var(--neon-cyan);
+  opacity: 1;
+}
+
+html .checklist__completed-toggle {
+  font-family: var(--display-font);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--neon-violet);
+  text-shadow: 0 0 8px rgba(185, 103, 255, 0.6);
+  border: none;
+  box-shadow: none;
+}
+
+html .checklist__footer {
+  background: rgba(18, 10, 36, 0.92);
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(to right, transparent, var(--neon-pink), var(--neon-cyan), transparent) 1;
+  font-family: var(--display-font);
+  letter-spacing: 0.05em;
+}
+
+html .checklist__stars {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 6px var(--neon-yellow), 0 0 14px var(--neon-orange);
+}

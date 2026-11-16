@@ -5,12 +5,13 @@ A self-hosted, Markdown file based task management board.
 
 This fork of [BaldissaraMatheus/Tasks.md](https://github.com/BaldissaraMatheus/Tasks.md) is tuned for phones and adds a few things:
 
-<img src="docs/synthwave-phone.png" alt="Synthwave theme in List view on a phone" width="300" align="right">
+<img src="docs/synthwave-phone.png" alt="Synthwave theme checklist on a phone" width="300" align="right">
 
-- **List view.** A new view mode stacks lanes as sections with one compact row per card. Phones open in List view by default.
+- **Checklist view.** The "List" view mode is a plain checklist with every open item in one list. Tap the box to check an item off, which moves its file into the `Done` lane (created on first use). Unchecking moves it back to `To do`. Tap an item's name to rename or delete it, add items from the field below the list, and drag to reorder. Completed items collect at the bottom, struck through, and a small footer counts them in stars. Phones open in this view by default, and the kanban views remain for desktop.
 - **Mobile layout.** The header collapses to a search box and an options button on small screens. Tap targets are larger, and the layout respects iPhone notches and the home indicator.
-- **Touch dragging.** Press and hold a card for about a third of a second to drag it. A finger that moves before then scrolls the page instead of grabbing the card, and iOS no longer shows its copy menu mid-drag.
+- **Touch dragging.** Press and hold an item for about a third of a second to drag it. A finger that moves before then scrolls the page instead of grabbing the item, and iOS no longer shows its copy menu mid-drag.
 - **Drag-and-drop fixes.** Containers re-measure their layout when a drag starts, so dragging works after switching view modes and in scrolled, stacked lanes. Dropping onto a lane's header now moves the card into that lane.
+- **Static file fix.** The server used to answer every unknown path with `index.html`, including fonts, the PWA manifest and the service worker. It now serves files that exist in the build and falls back to `index.html` for everything else.
 - **Synthwave theme.** A neon 80s color theme with a per-lane color cycle and the bundled [Audiowide](https://fonts.google.com/specimen/Audiowide) font (SIL Open Font License). It's the default for new installs. Switch themes by editing `custom.css` as described under Customize below.
 
 The published `baldissaramatheus/tasks.md` Docker image doesn't include these changes. Build your own image from this repo with `docker build -t tasks.md .` and use `tasks.md` as the image name in the commands below. To run without Docker, use `./run-local.sh`, which keeps data in `~/Code/tasks-md-data` (override with `DATA_DIR`) and serves on port 8080 (override with `PORT`).
