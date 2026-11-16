@@ -9,7 +9,7 @@ services:
     environment:
       # One-off auth key, only needed for the first start. Remove it once the
       # device shows up in the Tailscale admin console.
-      - TS_AUTHKEY=tskey-auth-REPLACE-ME
+      - TS_AUTHKEY=PASTE-AUTH-KEY-HERE
       - TS_STATE_DIR=/var/lib/tailscale
       # Userspace networking avoids needing /dev/net/tun and extra privileges on DSM.
       - TS_USERSPACE=true

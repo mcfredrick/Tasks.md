@@ -11,7 +11,7 @@ Runs the app in Container Manager next to a Tailscale container, which joins you
    deploy/synology/push-source.sh Matt@nas-address
    ```
    This creates `/volume1/docker/tasks-md` with `src/`, `tasks/`, `config/`, `tailscale/`, `docker-compose.yml` and `serve.json`.
-4. Edit `/volume1/docker/tasks-md/docker-compose.yml` on the NAS and replace `tskey-auth-REPLACE-ME` with the key.
+4. Edit `/volume1/docker/tasks-md/docker-compose.yml` on the NAS and replace `PASTE-AUTH-KEY-HERE` with the key.
 5. In Container Manager, go to Project → Create, set the path to `/volume1/docker/tasks-md`, choose "Use existing docker-compose.yml", and finish. The first build takes a few minutes, and the app builds its frontend again on each start, so give it another minute before opening it.
 6. Once `todo` shows up in the Tailscale admin console, delete the key from `docker-compose.yml`. In the console, you can also disable key expiry for `todo` so it doesn't drop off the tailnet after 180 days.
 
